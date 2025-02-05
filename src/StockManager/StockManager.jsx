@@ -2,6 +2,7 @@ import React from 'react'
 import "./StockManager.css"
 import { Collapse } from "antd"
 import AddStock from './AddStock/AddStock'
+import StockList from './StockList/StockList'
 function StockManager() {
   return (
     <React.Fragment>
@@ -14,7 +15,7 @@ function StockManager() {
                         {
                             key: "1",
                             label: "Inventario",
-                            children: "Inventario",
+                            children: <StockList/>,
                         },
                         {
                             key: "2",
