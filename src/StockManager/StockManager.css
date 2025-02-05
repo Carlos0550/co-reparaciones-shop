@@ -1,0 +1,27 @@
+.stock-manager-container{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+}
+
+.stock-manager-title{
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.stock-manager-options{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin: .5rem;
+    border-radius: 10px;
+    min-height: 30vh;
+}
+
+.stock-manager-option-title{
+    text-align: left;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
