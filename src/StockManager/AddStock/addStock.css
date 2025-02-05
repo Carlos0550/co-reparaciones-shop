@@ -112,9 +112,26 @@
     filter:grayscale(1);
 }
 
+.add-stock-button{
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #3315aa;
+    color: white;
+    max-width: 150px;
+    align-self:flex-end;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.add-stock-button:hover{
+    background-color: #19096c;
+}
+
 
 @media(min-width: 768px){
     .form-layout{
         flex-direction: column;
     }
 }
+
