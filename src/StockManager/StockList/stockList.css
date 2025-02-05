@@ -1,0 +1,14 @@
+.update-stock-btn{
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #102341;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 5px;
+}
+
+.update-stock-btn:hover{
+    transform: translateY(-3px);
+}
