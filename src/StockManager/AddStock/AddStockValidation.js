@@ -7,8 +7,9 @@ import { useAppContext } from "../../Context/AppContext"
 function AddStockValidation(editorRef) {
 
     const [fileList, setFileList] = useState([])
+    const [savingProduct, setSavingProduct] = useState(false)
     const { 
-        saveProducts
+        saveProducts, getAllProducts
      } = useAppContext()
 
     const uploadImages = async (e) => {
@@ -153,8 +154,11 @@ function AddStockValidation(editorRef) {
         })
         
         formData.append("product_description", editorInstance.getHTML())
+        setSavingProduct(true)
         const result = typeVerificationResult && await saveProducts(formData)
+        setSavingProduct(false)
         if(result) {
+            getAllProducts()
             editorInstance.setHTML('')
             setFileList([])
             formFields.forEach((field) => {
@@ -168,7 +172,7 @@ function AddStockValidation(editorRef) {
         deleteImage,
         formFieldsRef,
         handleVerifyFields,
-
+        savingProduct
     }
 }
 
