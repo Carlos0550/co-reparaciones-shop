@@ -18,6 +18,7 @@ function AddStock() {
         deleteImage,
         formFieldsRef,
         handleVerifyFields,
+        savingProduct
      } = AddStockValidation(editorRef)
 
     return (
@@ -129,7 +130,14 @@ function AddStock() {
 
                     </div>
 
-                    <button className='add-stock-button' type='submit' onClick={(e) => handleVerifyFields(e)}>Guardar producto</button>
+                    <button 
+                        className='add-stock-button' 
+                        type='submit' 
+                        disabled={savingProduct}
+                        onClick={(e) => handleVerifyFields(e)}
+                    >
+                        Guardar producto
+                    </button>
                 </form>
             </div>
         </React.Fragment>
