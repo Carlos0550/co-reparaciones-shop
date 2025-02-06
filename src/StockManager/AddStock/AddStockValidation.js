@@ -9,7 +9,7 @@ function AddStockValidation(editorRef) {
     const [fileList, setFileList] = useState([])
     const [savingProduct, setSavingProduct] = useState(false)
     const { 
-        saveProducts, getAllProducts
+        saveProducts, getInitialProducts
      } = useAppContext()
 
     const uploadImages = async (e) => {
@@ -157,8 +157,9 @@ function AddStockValidation(editorRef) {
         setSavingProduct(true)
         const result = typeVerificationResult && await saveProducts(formData)
         setSavingProduct(false)
+
         if(result) {
-            getAllProducts()
+            getInitialProducts()
             editorInstance.setHTML('')
             setFileList([])
             formFields.forEach((field) => {
