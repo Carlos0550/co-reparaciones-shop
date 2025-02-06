@@ -11,6 +11,7 @@ function StockManager() {
             <div className="stock-manager-options">
                 <Collapse
                     accordion
+                    destroyInactivePanel
                     items={[
                         {
                             key: "1",
