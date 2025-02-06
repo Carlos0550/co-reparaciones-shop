@@ -4,7 +4,8 @@ import { message, notification } from 'antd'
 
 function useProducts() {
     const [products, setProducts] = useState([])
-    const getAllProducts = useCallback(async() => {
+    const getInitialProducts = useCallback(async() => {
+        const hiddenMessage = message.loading("Un momento...",0)
 
         const url = apis.products
         const newUrl = new URL(`${url}/get-products`)
@@ -28,6 +29,8 @@ function useProducts() {
                 duration: 3
             })
             return false
+        }finally{
+            hiddenMessage()
         }
     },[])
 
@@ -44,7 +47,7 @@ function useProducts() {
                 const errorMessage = await response.json()
                 throw new Error(errorMessage.message)
             }
-            await getAllProducts()
+            await getInitialProducts()
             message.success("Producto guardado con exito")
             return true
         } catch (error) {
@@ -58,17 +61,19 @@ function useProducts() {
             return false
         }
     
-    },[getAllProducts])
+    },[getInitialProducts])
 
     
   return useMemo(() => ({
     saveProducts,
-    getAllProducts,
-    products
+    getInitialProducts,
+    products,
+    setProducts
   }),[
     saveProducts,
-    getAllProducts,
-    products
+    getInitialProducts,
+    products,
+    setProducts
   ])
 }
 
