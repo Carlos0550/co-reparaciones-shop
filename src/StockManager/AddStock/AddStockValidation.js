@@ -1,5 +1,5 @@
 import { message, notification } from "antd"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { v4 } from "uuid"
 import { compressImage } from "./CompressImages"
 import { useAppContext } from "../../Context/AppContext"
@@ -8,6 +8,8 @@ function AddStockValidation(editorRef) {
 
     const [fileList, setFileList] = useState([])
     const [savingProduct, setSavingProduct] = useState(false)
+    const [hasOptionsShop, setHasOptionsShop] = useState(false)
+    const [optionsShop, setOptionsShop] = useState([])
     const { 
         saveProducts, getInitialProducts
      } = useAppContext()
@@ -106,6 +108,8 @@ function AddStockValidation(editorRef) {
         }
 
         formFields.forEach((field) => {
+
+            if(["product_images_span", "title_option_shop", "product_options_shop"].includes(field.name)) return
             const referenceNameToValues = {
                 product_name: {
                     name: "nombre del producto",
@@ -126,11 +130,11 @@ function AddStockValidation(editorRef) {
                 },
             }
 
-            if (field.value.length === 0 && field.name !== "product_images_span") {
+            if (field.value.length === 0) {
                 if (!hasError) {
                     notification.error({
                         message: "Error al guardar el producto",
-                        description: referenceNameToValues[field.name].message,
+                        description: referenceNameToValues[field?.name]?.message || "El campo " + referenceNameToValues[field.name].name + " no puede estar vacio",
                         showProgress: true,
                         pauseOnHover: false,
                         duration: 3
@@ -154,6 +158,14 @@ function AddStockValidation(editorRef) {
         })
         
         formData.append("product_description", editorInstance.getHTML())
+        if(hasOptionsShop) {
+            const allOptionsShop = []
+            Object.entries(optionsShop).map(([title, option]) => {
+                allOptionsShop.push({ title, option });
+            })
+            formData.append("options_shop", JSON.stringify(allOptionsShop));
+        }
+
         setSavingProduct(true)
         const result = typeVerificationResult && await saveProducts(formData)
         setSavingProduct(false)
@@ -165,15 +177,68 @@ function AddStockValidation(editorRef) {
             formFields.forEach((field) => {
                 field.value = ""
             })
+            setHasOptionsShop(false)
         }
     }
+
+
+    const titleOptionShopRef = useRef(null)
+    const optionsShopRef = useRef(null)
+    const handleSetOptionsShop = () => {
+        const title = titleOptionShopRef.current.value.trim()
+        const options = optionsShopRef.current.value
+
+        if(title.trim() === "") return message.error("El titulo no puede estar vacio")
+        if(options.trim() === "") return message.error("Las opciones no pueden estar vacias")
+
+        const capitalizeWords = (str) => {
+            return str
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+        const parsedOptions = options.split(/\r?\n|,/g).map(option => capitalizeWords(option.trim()))
+        
+        const formattedTitle = capitalizeWords(title);
+        if (optionsShop[formattedTitle]) {
+            return message.error("Ya existe una opción con ese título");
+        }
+        
+        setOptionsShop((prevOptions) => ({
+            ...prevOptions,
+            [formattedTitle]: parsedOptions,
+        }));
+
+        optionsShopRef.current.value = ""
+        titleOptionShopRef.current.value = ""
+        message.success("Opciones agregadas correctamente")
+    }
+
+    const deleteOptionShop = (title) => {
+        setOptionsShop((prevOptions) => {
+            const updatedOptions = { ...prevOptions };
+            delete updatedOptions[title];
+            return updatedOptions;
+        });
+    };
+
+    useEffect(() => {
+        console.log(optionsShop)
+    }, [optionsShop])
     return {
         fileList,
         uploadImages,
         deleteImage,
         formFieldsRef,
         handleVerifyFields,
-        savingProduct
+        savingProduct,
+        hasOptionsShop, 
+        setHasOptionsShop,
+        optionsShop,
+        handleSetOptionsShop,
+        titleOptionShopRef,
+        optionsShopRef,
+        deleteOptionShop
     }
 }
 
