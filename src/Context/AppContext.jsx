@@ -19,13 +19,32 @@ export const AppContextProvider = ({children}) => {
         return () => window.removeEventListener('resize', handleResize)
     },[])
 
-    const productsHook = useProducts()
+    const [isOnline, setIsOnline] = useState(navigator.onLine)
+
+    useEffect(()=>{
+        const handleOnline = () => setIsOnline(true)
+        const handleOffline = () => setIsOnline(false)
+        window.addEventListener('online', handleOnline)
+        window.addEventListener('offline', handleOffline)
+        return () => {
+            window.removeEventListener('online', handleOnline)
+            window.removeEventListener('offline', handleOffline)
+        }
+    },[])
+
+    useEffect(()=>{
+        console.log("Online: ", isOnline)
+    },[isOnline])
+
+    const productsHook = useProducts(isOnline)
     const contextValues = useMemo(() => ({
         width,
-        ...productsHook
+        ...productsHook,
+        isOnline
     }),[
         width,
-        productsHook
+        productsHook,
+        isOnline
     ])
 
     return (
