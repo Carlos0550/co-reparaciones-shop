@@ -1,14 +1,15 @@
-import { Button, Modal, notification, Popover } from 'antd'
+import { Button, Modal, notification, Popconfirm, Popover, Space } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 import { apis } from '../../../apis'
-import { SettingOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons'
 import { useAppContext } from '../../Context/AppContext'
 
 function useStockList() {
 
   const {
     products, setProducts,
-    getInitialProducts
+    getInitialProducts,
+    deleteProduct
   } = useAppContext()
   const [openModalId, setOpenModalId] = useState(null)
   const [openImagesModalId, setOpenImagesModalId] = useState(null)
@@ -16,12 +17,12 @@ function useStockList() {
   const [searching, setSearching] = useState(false)
 
   const alreadySearched = useRef(false)
-  useEffect(()=>{
-    if(searchText.trim() === "" && !alreadySearched.current){
+  useEffect(() => {
+    if (searchText.trim() === "" && !alreadySearched.current) {
       alreadySearched.current = true
       getInitialProducts()
-    } 
-  },[getInitialProducts, searchText])
+    }
+  }, [getInitialProducts, searchText])
 
   const normalizedText = (text) => {
     return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
@@ -30,27 +31,27 @@ function useStockList() {
     const productFound = products.find(pr =>
       normalizedText(pr.product_name).includes(normalizedText(searchText))
     );
-  
+
     if (productFound) {
       return setProducts([productFound]);
     }
-  
+
     return null;
   };
-  
+
   const handleSearch = async () => {
-      alreadySearched.current = false
+    alreadySearched.current = false
     try {
       setSearching(true);
-      
+
       const foundProduct = localeSearch();
-  
+
       if (!foundProduct) {
         const url = apis.products
         const newUrl = new URL(`${url}/search-product/${searchText}`)
         const response = await fetch(newUrl)
         const responseData = await response.json()
-        if(!response.ok) return notification.error({
+        if (!response.ok) return notification.error({
           message: responseData.message,
           showProgress: true,
           pauseOnHover: false,
@@ -60,14 +61,14 @@ function useStockList() {
         setProducts(responseData.products);
         return;
       }
-  
+
     } catch (error) {
       console.log("Error en la búsqueda:", error);
     } finally {
       setSearching(false);
     }
   };
-  
+
 
   const stockListColumns = [
     {
@@ -81,7 +82,7 @@ function useStockList() {
       title: "Descripción",
       render: (_, record) => {
         const isOpen = openModalId === record.product_id
-
+        const product_options = JSON.parse(record?.product_options) || []
         return (
           <>
             <Button onClick={() => setOpenModalId(record.product_id)}>Ver descripción</Button>
@@ -100,7 +101,25 @@ function useStockList() {
                 </Button>
               ]}
             >
+
               <div dangerouslySetInnerHTML={{ __html: record.product_description }}></div>
+              {product_options && product_options.length > 0 && (
+                <>
+                <h4>Opciones de compra</h4>
+                  <div className='add-options-list'>
+                  {product_options && product_options.map((item, index) => (
+                    <div key={index} style={{ marginBottom: '20px' }} className='option-list'>
+                      <h3>{item.title}</h3>
+                      <ul>
+                        {item.option.map((option, idx) => (
+                          <li key={idx}>{option}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+                </>
+              )}
             </Modal>
           </>
         )
@@ -162,7 +181,24 @@ function useStockList() {
       }
     }, {
       render: (_, record) => (
-        <Popover>
+        <Popover
+          key={record.product_id}
+          content={
+            <Space direction='vertical'>
+              <Button icon={<EditOutlined />} />
+              <Popconfirm
+                title="Eliminar producto"
+                description="Estas seguro de eliminar el producto?"
+                onConfirm={() => deleteProduct(record.product_id)}
+                okText="Si"
+                cancelText="No"
+                okButtonProps={{ danger: true }}
+              >
+                <Button icon={<DeleteOutlined />} danger />
+              </Popconfirm>
+            </Space>
+          }
+        >
           <Button icon={<SettingOutlined />} variant='outlined' />
         </Popover>
       )
@@ -170,13 +206,12 @@ function useStockList() {
 
   ]
 
-  useEffect(()=>{
-    console.log(searchText)
-  },[searchText])
+
   return {
     stockListColumns,
     handleSearch,
-    setSearchText
+    setSearchText,
+    searchText
   }
 }
 
