@@ -4,6 +4,8 @@ import "./addStock.css"
 import { Editor } from "@toast-ui/react-editor"
 import "@toast-ui/editor/toastui-editor.css"
 import AddStockValidation from './AddStockValidation'
+import { Switch } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
 function AddStock() {
     const editorRef = useRef(null)
 
@@ -12,14 +14,20 @@ function AddStock() {
         editorInstance.setHTML('');
     }, []);
 
-    const { 
+    const {
         fileList,
         uploadImages,
         deleteImage,
         formFieldsRef,
         handleVerifyFields,
-        savingProduct
-     } = AddStockValidation(editorRef)
+        savingProduct,
+        hasOptionsShop, setHasOptionsShop,
+        optionsShop,
+        handleSetOptionsShop,
+        titleOptionShopRef,
+        optionsShopRef,
+        deleteOptionShop
+    } = AddStockValidation(editorRef)
 
     return (
         <React.Fragment>
@@ -45,7 +53,71 @@ function AddStock() {
                                 />
                             </label>
                         </div>
+                        <label htmlFor="product_options_shop" className='product_options_shop-label'>Opciones de compra
 
+                            <Switch
+                                checkedChildren="Si"
+                                unCheckedChildren="No"
+                                className='product_options_shop-switch'
+                                onChange={setHasOptionsShop}
+                                checked={hasOptionsShop}
+                            />
+
+                            {
+                                hasOptionsShop && (
+                                    <>
+                                        <button
+                                            type='button'
+                                            className='add-stock-button add-stock-button-options'
+                                            onClick={handleSetOptionsShop}
+                                        >
+                                            Agregar <PlusOutlined />
+                                        </button>
+                                        <p>Que nombre le quieres dar a las opciones</p>
+                                        <input
+                                            placeholder='Ingresá un titulo'
+                                            ref={titleOptionShopRef}
+                                            name='title_option_shop'
+                                            type="text" className='add-stock-input add-stock-input-options' />
+
+                                        <p>Opciones (Separados por comas o saltos de linea):</p>
+                                        <textarea
+                                            ref={optionsShopRef}
+                                            name="product_options_shop"
+                                            placeholder='Ingresa las opciones de compra'
+                                            className='add-options-textarea'
+                                        />
+
+                                        {
+                                            Object.keys(optionsShop).length > 0 && (
+                                                <>
+                                                    <p style={{
+                                                        color: "red"
+                                                    }}>Clickea una opcion para eliminar</p>
+                                                    <div className='add-options-list'>
+
+                                                        {
+                                                            Object.entries(optionsShop).map(([title, options], index) => (
+                                                                <div key={title} className='option-list' onClick={() => deleteOptionShop(title)}>
+                                                                    <strong>{index + 1} - {title}</strong>
+                                                                    {
+                                                                        options.map((option, index) => (
+                                                                            <ul key={`option-${index + 1}`}>
+                                                                                <li>{option}</li>
+                                                                            </ul>
+                                                                        ))
+                                                                    }
+                                                                </div>
+                                                            ))
+                                                        }
+                                                    </div>
+                                                </>
+                                            )
+                                        }
+                                    </>
+                                )
+                            }
+                        </label>
                         <label htmlFor="description" className='add-stock-label'>Descripción del producto
                             <Editor
                                 ref={editorRef}
@@ -59,12 +131,10 @@ function AddStock() {
                                 }}
                                 hideModeSwitch
                                 toolbarItems={[
-                                    ['bold', 'italic', 'strike'],
+                                    ['heading', 'bold', 'italic', 'strike'],
                                     ['link'],
                                     ['quote'],
                                     ['ul', 'ol'],
-                                    ['table'],
-
                                 ]}
 
                             />
@@ -130,9 +200,9 @@ function AddStock() {
 
                     </div>
 
-                    <button 
-                        className='add-stock-button' 
-                        type='submit' 
+                    <button
+                        className='add-stock-button'
+                        type='submit'
                         disabled={savingProduct}
                         onClick={(e) => handleVerifyFields(e)}
                     >
