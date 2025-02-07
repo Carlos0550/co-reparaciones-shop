@@ -6,22 +6,24 @@ import useStockList from './useStockList.jsx'
 import { CloseOutlined, SearchOutlined } from '@ant-design/icons'
 function StockList() {
     const { 
-        getInitialProducts, products
+        getInitialProducts, products, isOnline,
      } = useAppContext()
 
     const { 
         stockListColumns,
-        handleSearch, setSearchText
+        handleSearch, setSearchText,
+        searchText
      } = useStockList()
 
     const initialCall = useRef(false)
 
     useEffect(() => {
+        if(!isOnline) return;
         if (!initialCall.current) {
             getInitialProducts()
             initialCall.current = true;
         }
-    }, [getInitialProducts]);
+    }, [getInitialProducts, isOnline]);
 
     useEffect(()=>{
         const handleKeyDown = (e) => {
@@ -49,8 +51,11 @@ function StockList() {
                 onChange={(e) => setSearchText(e.target.value)}
             />
             <SearchOutlined 
-                onClick={() => handleSearch()}
-                className='cross-icon-stock-list'/>
+                onClick={() => {
+                    searchText.trim() !== "" && handleSearch()
+                }}
+                className='cross-icon-stock-list'
+            />
         </label>
         <Table
             columns={stockListColumns}
