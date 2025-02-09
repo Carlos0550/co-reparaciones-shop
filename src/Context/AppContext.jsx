@@ -32,19 +32,22 @@ export const AppContextProvider = ({children}) => {
         }
     },[])
 
-    useEffect(()=>{
-        console.log("Online: ", isOnline)
-    },[isOnline])
+    const [editStockArguments, setEditStockArguments] = useState({
+        editing: false,
+        productID: null
+    })
 
     const productsHook = useProducts(isOnline)
     const contextValues = useMemo(() => ({
         width,
         ...productsHook,
-        isOnline
+        isOnline,
+        editStockArguments, setEditStockArguments
     }),[
         width,
         productsHook,
-        isOnline
+        isOnline,
+        editStockArguments, setEditStockArguments
     ])
 
     return (
