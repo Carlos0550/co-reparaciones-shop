@@ -2,11 +2,14 @@ import { Table } from 'antd'
 import React, { useEffect, useRef } from 'react'
 import "./stockList.css"
 import { useAppContext } from '../../Context/AppContext'
-import useStockList from './useStockList.jsx'
-import { CloseOutlined, SearchOutlined } from '@ant-design/icons'
+import useStockList from './HooksStockList/useStockList.jsx'
+import { SearchOutlined } from '@ant-design/icons'
+
+import EditStockModal from "./HooksStockList/EditStockModal.jsx"
 function StockList() {
     const { 
         getInitialProducts, products, isOnline,
+        editStockArguments
      } = useAppContext()
 
     const { 
@@ -36,7 +39,6 @@ function StockList() {
         return () => document.removeEventListener("keydown", handleKeyDown)
     },[handleSearch])
 
-
   return (
     <React.Fragment>
         <button 
@@ -64,6 +66,11 @@ function StockList() {
             rowHoverable
             scroll={{x: 500}}
         />
+        {editStockArguments.editing && (
+            <EditStockModal/>
+        )}
+
+    
     </React.Fragment>
   )
 }

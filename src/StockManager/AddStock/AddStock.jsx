@@ -6,7 +6,7 @@ import "@toast-ui/editor/toastui-editor.css"
 import AddStockValidation from './AddStockValidation'
 import { Switch } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-function AddStock() {
+function AddStock({ productToEdit }) {
     const editorRef = useRef(null)
 
     useEffect(() => {
@@ -27,8 +27,7 @@ function AddStock() {
         titleOptionShopRef,
         optionsShopRef,
         deleteOptionShop
-    } = AddStockValidation(editorRef)
-
+    } = AddStockValidation(editorRef, productToEdit)
     return (
         <React.Fragment>
             <div className='add-stock-container'>

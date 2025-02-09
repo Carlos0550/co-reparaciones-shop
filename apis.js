@@ -1,4 +1,4 @@
-const urls = {
+export const urls = {
     production: {
         baseUrl: ""
     },
