@@ -3,16 +3,18 @@ import { useEffect, useRef, useState } from "react"
 import { v4 } from "uuid"
 import { compressImage } from "./CompressImages"
 import { useAppContext } from "../../Context/AppContext"
+import { apis, urls } from "../../../apis"
 
-function AddStockValidation(editorRef) {
+function AddStockValidation(editorRef, productToEdit) {
 
     const [fileList, setFileList] = useState([])
     const [savingProduct, setSavingProduct] = useState(false)
     const [hasOptionsShop, setHasOptionsShop] = useState(false)
     const [optionsShop, setOptionsShop] = useState([])
-    const { 
-        saveProducts, getInitialProducts
-     } = useAppContext()
+    const {
+        saveProducts, getInitialProducts,
+        setEditStockArguments
+    } = useAppContext()
 
     const uploadImages = async (e) => {
         const files = e.target.files
@@ -27,6 +29,7 @@ function AddStockValidation(editorRef) {
 
             newFiles.push({
                 uid: v4(),
+                editing: false,
                 originalFile: newOptimicedFile,
                 name: `${v4().slice(0, 10)}.${newOptimicedFiles.type.split("/").pop()}`,
                 status: 'done',
@@ -38,7 +41,6 @@ function AddStockValidation(editorRef) {
         setFileList((prev) => [...prev, ...newFiles].slice(0, 4))
 
     }
-
 
     const deleteImage = (uid) => {
         setFileList((prev) => prev.filter((file) => file.uid !== uid))
@@ -88,7 +90,7 @@ function AddStockValidation(editorRef) {
         return true
     }
 
-    const handleVerifyFields = async(e) => {
+    const handleVerifyFields = async (e) => {
         e.preventDefault()
         const editorInstance = editorRef.current.getInstance();
         const content = editorInstance.getHTML().replace(/<.*?>/g, "").trim();
@@ -109,7 +111,7 @@ function AddStockValidation(editorRef) {
 
         formFields.forEach((field) => {
 
-            if(["product_images_span", "title_option_shop", "product_options_shop"].includes(field.name)) return
+            if (["product_images_span", "title_option_shop", "product_options_shop"].includes(field.name)) return
             const referenceNameToValues = {
                 product_name: {
                     name: "nombre del producto",
@@ -150,22 +152,45 @@ function AddStockValidation(editorRef) {
         const formData = new FormData()
         for (const element of formFields) {
 
-            if(element.name === "product_images_span") continue
+            if (["product_images_span", "title_option_shop"].includes(element.name)) continue
             formData.append(element.name, element.value)
         }
+
+        const imagesToMaintain = []; 
+
         fileList.forEach((file) => {
-            formData.append("product_images", file.originalFile)
-        })
-        
+            if (file.editing) {
+                const urlSinBase = file.thumbUrl.replace(urls.development.baseUrl, "");
+                imagesToMaintain.push(urlSinBase);
+                formData.append("images_to_maintain", urlSinBase);
+            } else {
+                formData.append("product_images", file.originalFile || "");
+            }
+        });
+        let imagesToDelete = [];
+        if(productToEdit){
+            imagesToDelete = productToEdit.images.filter(
+                (img) => !imagesToMaintain.includes(img)
+            );
+    
+            formData.append("images_to_delete", JSON.stringify(imagesToDelete));
+        }
+
         formData.append("product_description", editorInstance.getHTML())
-        if(hasOptionsShop) {
+        if (hasOptionsShop) {
             const allOptionsShop = []
             Object.entries(optionsShop).map(([title, option]) => {
                 allOptionsShop.push({ title, option });
             })
             formData.append("options_shop", JSON.stringify(allOptionsShop));
         }
-
+        if(productToEdit) {
+            formData.append("product_id", productToEdit.product_id)
+            formData.append("is_editing", true)
+        }else{
+            formData.append("is_editing", false)
+        }
+        
         setSavingProduct(true)
         const result = typeVerificationResult && await saveProducts(formData)
         setSavingProduct(false)
@@ -178,6 +203,7 @@ function AddStockValidation(editorRef) {
                 field.value = ""
             })
             setHasOptionsShop(false)
+            setEditStockArguments({editing: false, productID: null})
         }
     }
 
@@ -188,8 +214,8 @@ function AddStockValidation(editorRef) {
         const title = titleOptionShopRef.current.value.trim()
         const options = optionsShopRef.current.value
 
-        if(title.trim() === "") return message.error("El titulo no puede estar vacio")
-        if(options.trim() === "") return message.error("Las opciones no pueden estar vacias")
+        if (title.trim() === "") return message.error("El titulo no puede estar vacio")
+        if (options.trim() === "") return message.error("Las opciones no pueden estar vacias")
 
         const capitalizeWords = (str) => {
             return str
@@ -198,12 +224,12 @@ function AddStockValidation(editorRef) {
                 .join(' ');
         }
         const parsedOptions = options.split(/\r?\n|,/g).map(option => capitalizeWords(option.trim()))
-        
+
         const formattedTitle = capitalizeWords(title);
         if (optionsShop[formattedTitle]) {
             return message.error("Ya existe una opción con ese título");
         }
-        
+
         setOptionsShop((prevOptions) => ({
             ...prevOptions,
             [formattedTitle]: parsedOptions,
@@ -223,8 +249,57 @@ function AddStockValidation(editorRef) {
     };
 
     useEffect(() => {
-        console.log(optionsShop)
-    }, [optionsShop])
+        if (productToEdit && Object.keys(productToEdit).length > 0) {
+            const formFields = Array.from(formFieldsRef.current.querySelectorAll('input'))
+            const { images, product_description, product_options } = productToEdit
+            editorRef.current.getInstance().setHTML(product_description)
+
+            formFields.forEach((field) => {
+                if (
+                    [
+                        "product_images",
+                        "product_images_span",
+                        "title_option_shop",
+                        "product_options_shop",
+                        "title_option_shop"
+                    ]
+                        .includes(field.name)) return;
+                field.value = productToEdit[field.name];
+            });
+
+            setFileList(images.map(image => ({
+                uid: v4(),
+                name: `editing-image-${image}`,
+                editing: true,
+                status: 'done',
+                type: `image/${image.split(".").pop()}`,
+                thumbUrl: `${apis.products}/${image}`.replace("/products/", "")
+            })));
+
+            let parsedOptionsShop = []
+            try {
+                if (product_options !== "[]") {
+                    parsedOptionsShop = JSON.parse(product_options);
+                    if (parsedOptionsShop.length > 0) {
+                        setHasOptionsShop(true);
+
+                        const formattedOptions = parsedOptionsShop.reduce((acc, option) => {
+                            acc[option.title] = option.option;
+                            return acc;
+                        }, {});
+
+                        setOptionsShop((prevOptions) => ({
+                            ...prevOptions,
+                            ...formattedOptions,
+                        }));
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }, [productToEdit, editorRef, formFieldsRef])
+
     return {
         fileList,
         uploadImages,
@@ -232,7 +307,7 @@ function AddStockValidation(editorRef) {
         formFieldsRef,
         handleVerifyFields,
         savingProduct,
-        hasOptionsShop, 
+        hasOptionsShop,
         setHasOptionsShop,
         optionsShop,
         handleSetOptionsShop,
