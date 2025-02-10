@@ -5,3 +5,47 @@
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
 }
+
+.toastui-editor-main-container{
+  z-index: 0 !important;
+}
+
+@media(max-width:680px){
+  .toastui-editor-popup{
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: absolute;
+      left: 50%;
+      right: 50%;
+      z-index: 999 !important;
+      transform: translate(50%, -50%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 100%;
+     
+  }
+}
+
+.promotion-form-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px; 
+  position: relative;
+}
+
+.text-label {
+  margin: 0;
+}
+
+.required-asterisk {
+  color: red;
+  font-size: 14px; 
+  position: relative;
+  top: -2px; 
+}
