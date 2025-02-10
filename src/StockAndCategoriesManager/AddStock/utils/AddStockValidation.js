@@ -1,9 +1,11 @@
-import { message, notification } from "antd"
+import { message } from "antd"
 import { useEffect, useRef, useState } from "react"
 import { v4 } from "uuid"
-import { compressImage } from "./CompressImages"
-import { useAppContext } from "../../Context/AppContext"
-import { apis, urls } from "../../../apis"
+
+import { useAppContext } from "../../../Context/AppContext"
+import { apis, urls } from "../../../../apis"
+import handleUpload from "./ImageUploader"
+import { handleVerifyFields, handleVerifyValues } from "./VerifyStockFields"
 
 function AddStockValidation(editorRef, productToEdit) {
 
@@ -13,33 +15,13 @@ function AddStockValidation(editorRef, productToEdit) {
     const [optionsShop, setOptionsShop] = useState([])
     const {
         saveProducts, getInitialProducts,
-        setEditStockArguments
+        setEditStockArguments, categories
     } = useAppContext()
+    
 
     const uploadImages = async (e) => {
-        const files = e.target.files
-        const filesArray = Array.from(files)
-        const newFiles = []
-        for (const file of filesArray) {
-            const newOptimicedFiles = await compressImage(file)
-            const newOptimicedFile = new File([newOptimicedFiles], `${v4().slice(0, 10)}.${newOptimicedFiles.type.split("/").pop()}`, {
-                type: newOptimicedFiles.type
-
-            })
-
-            newFiles.push({
-                uid: v4(),
-                editing: false,
-                originalFile: newOptimicedFile,
-                name: `${v4().slice(0, 10)}.${newOptimicedFiles.type.split("/").pop()}`,
-                status: 'done',
-                type: newOptimicedFiles.type,
-                thumbUrl: URL.createObjectURL(newOptimicedFiles)
-            })
-        }
-
+        const newFiles = await handleUpload(e)
         setFileList((prev) => [...prev, ...newFiles].slice(0, 4))
-
     }
 
     const deleteImage = (uid) => {
@@ -48,106 +30,15 @@ function AddStockValidation(editorRef, productToEdit) {
 
     const formFieldsRef = useRef(null)
 
-    const handleVerifyValues = () => {
-        const formFields = Array.from(formFieldsRef.current.querySelectorAll('input'))
-
-        const productPriceInput = formFields.find(element => element.name === "product_price")
-        const productStockInput = formFields.find(element => element.name === "product_stock")
-
-        if (!productPriceInput || !productStockInput) {
-            notification.error({
-                message: "No se encontraron los campos de precio y stock",
-                showProgress: true,
-                pauseOnHover: false,
-                duration: 3
-            })
-            return false
-        }
-
-        const productPrice = parseFloat(productPriceInput.value)
-        const productStock = parseInt(productStockInput.value)
-
-        if (isNaN(productPrice) || productPrice <= 0) {
-            notification.error({
-                message: "El precio debe ser un número mayor a 0",
-                showProgress: true,
-                pauseOnHover: false,
-                duration: 3
-            })
-            return false
-        }
-
-        if (isNaN(productStock) || productStock <= 0) {
-            notification.error({
-                message: "El stock debe ser un número mayor a 0",
-                showProgress: true,
-                pauseOnHover: false,
-                duration: 3
-            })
-            return false
-        }
-
-        return true
-    }
-
-    const handleVerifyFields = async (e) => {
+    const onFinishStock = async (e) => {
         e.preventDefault()
         const editorInstance = editorRef.current.getInstance();
         const content = editorInstance.getHTML().replace(/<.*?>/g, "").trim();
 
-        const formFields = formFieldsRef.current.querySelectorAll('input')
-        let hasError = false;
-
-        if (!content || content.length === 0) {
-            notification.error({
-                message: "La descripción no puede estar vacia",
-                showProgress: true,
-                pauseOnHover: false,
-                duration: 3
-            })
-            hasError = true;
-            return;
-        }
-
-        formFields.forEach((field) => {
-
-            if (["product_images_span", "title_option_shop", "product_options_shop"].includes(field.name)) return
-            const referenceNameToValues = {
-                product_name: {
-                    name: "nombre del producto",
-                    message: "El nombre del producto no puede estar vacio"
-
-                },
-                product_price: {
-                    name: "precio del producto",
-                    message: "El precio del producto no puede estar vacio"
-                },
-                product_stock: {
-                    name: "stock del producto",
-                    message: "El stock del producto no puede estar vacio"
-                },
-                product_images: {
-                    name: "imagenes del producto",
-                    message: "Introduce al menos una imagen."
-                },
-            }
-
-            if (field.value.length === 0) {
-                if (!hasError) {
-                    notification.error({
-                        message: "Error al guardar el producto",
-                        description: referenceNameToValues[field?.name]?.message || "El campo " + referenceNameToValues[field.name].name + " no puede estar vacio",
-                        showProgress: true,
-                        pauseOnHover: false,
-                        duration: 3
-                    })
-                    hasError = true;
-                    return;
-                }
-            }
-        })
-
-        const typeVerificationResult = !hasError && handleVerifyValues()
+        const formFields = formFieldsRef.current.querySelectorAll('input, select')
+        
+        const hasError = handleVerifyFields(content, formFields)
+        const typeVerificationResult = !hasError && handleVerifyValues(formFieldsRef)
 
         const formData = new FormData()
         for (const element of formFields) {
@@ -250,10 +141,10 @@ function AddStockValidation(editorRef, productToEdit) {
 
     useEffect(() => {
         if (productToEdit && Object.keys(productToEdit).length > 0) {
-            const formFields = Array.from(formFieldsRef.current.querySelectorAll('input'))
-            const { images, product_description, product_options } = productToEdit
+            const formFields = Array.from(formFieldsRef.current.querySelectorAll('input, select'))
+            const { images, product_description, product_options, product_category } = productToEdit
             editorRef.current.getInstance().setHTML(product_description)
-
+            console.log(product_category)
             formFields.forEach((field) => {
                 if (
                     [
@@ -265,6 +156,13 @@ function AddStockValidation(editorRef, productToEdit) {
                     ]
                         .includes(field.name)) return;
                 field.value = productToEdit[field.name];
+
+                if (field.name === "product_category") {
+                    const selectedCategory = categories.find(cat => cat.category_id === product_category);
+                    if (selectedCategory) {
+                        field.value = selectedCategory.category_id; 
+                    }
+                }
             });
 
             setFileList(images.map(image => ({
@@ -298,14 +196,16 @@ function AddStockValidation(editorRef, productToEdit) {
                 console.log(error);
             }
         }
-    }, [productToEdit, editorRef, formFieldsRef])
+    }, [productToEdit, editorRef, formFieldsRef, categories])
+
+    
 
     return {
         fileList,
         uploadImages,
         deleteImage,
         formFieldsRef,
-        handleVerifyFields,
+        onFinishStock,
         savingProduct,
         hasOptionsShop,
         setHasOptionsShop,

@@ -3,23 +3,36 @@ import "./addStock.css"
 
 import { Editor } from "@toast-ui/react-editor"
 import "@toast-ui/editor/toastui-editor.css"
-import AddStockValidation from './AddStockValidation'
+import AddStockValidation from './utils/AddStockValidation'
 import { Switch } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
+import { useAppContext } from '../../Context/AppContext'
 function AddStock({ productToEdit }) {
     const editorRef = useRef(null)
+    const { 
+        categories,
+        getCategories
+    } = useAppContext()
 
     useEffect(() => {
         const editorInstance = editorRef.current.getInstance();
         editorInstance.setHTML('');
-    }, []);
+    }, [editorRef]);
+
+    const alreadyFetched = useRef(false)
+    useEffect(()=>{
+        if(alreadyFetched.current || categories.length > 0) return;
+        alreadyFetched.current = true
+        getCategories()
+
+    },[getCategories, categories])
 
     const {
         fileList,
         uploadImages,
         deleteImage,
         formFieldsRef,
-        handleVerifyFields,
+        onFinishStock,
         savingProduct,
         hasOptionsShop, setHasOptionsShop,
         optionsShop,
@@ -45,11 +58,24 @@ function AddStock({ productToEdit }) {
                                     placeholder='Ingresa el precio del producto'
                                 />
                             </label>
+                        </div>
 
+                        <div className="label-stock-layout">
                             <label htmlFor="product_stock" className='add-stock-label'>Stock disponible
                                 <input name='product_stock' type="text" className='add-stock-input'
                                     placeholder='Ingresa el stock disponible'
                                 />
+                            </label>
+
+                            <label htmlFor="product_category" className='add-stock-label'>
+                                Categoría
+                            <select name="product_category" id="product_category" className='add-stock-input'>
+                                {
+                                    categories.map((category, index) => (
+                                        <option key={index} value={category.category_id}>{category.category_name}</option>
+                                    ))
+                                }
+                            </select>
                             </label>
                         </div>
                         <label htmlFor="product_options_shop" className='product_options_shop-label'>Opciones de compra
@@ -203,7 +229,7 @@ function AddStock({ productToEdit }) {
                         className='add-stock-button'
                         type='submit'
                         disabled={savingProduct}
-                        onClick={(e) => handleVerifyFields(e)}
+                        onClick={(e) => onFinishStock(e)}
                     >
                         Guardar producto
                     </button>

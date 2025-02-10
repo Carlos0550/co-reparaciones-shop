@@ -1,7 +1,7 @@
 import { Table } from 'antd'
 import React, { useEffect, useRef } from 'react'
 import "./stockList.css"
-import { useAppContext } from '../../Context/AppContext'
+import { useAppContext } from '../../Context/AppContext.jsx'
 import useStockList from './HooksStockList/useStockList.jsx'
 import { SearchOutlined } from '@ant-design/icons'
 
@@ -18,15 +18,6 @@ function StockList() {
         searchText
      } = useStockList()
 
-    const initialCall = useRef(false)
-
-    useEffect(() => {
-        if(!isOnline) return;
-        if (!initialCall.current) {
-            getInitialProducts()
-            initialCall.current = true;
-        }
-    }, [getInitialProducts, isOnline]);
 
     useEffect(()=>{
         const handleKeyDown = (e) => {

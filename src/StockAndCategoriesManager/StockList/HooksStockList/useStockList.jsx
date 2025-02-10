@@ -1,5 +1,5 @@
 import { Button, Modal, notification, Popconfirm, Popover, Space } from 'antd'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { apis } from '../../../../apis'
 import { DeleteOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons'
 import { useAppContext } from '../../../Context/AppContext'
@@ -8,21 +8,13 @@ function useStockList() {
 
   const {
     products, setProducts,
-    getInitialProducts,
-    deleteProduct, setEditStockArguments
+    deleteProduct, setEditStockArguments,
+    categories
   } = useAppContext()
   const [openModalId, setOpenModalId] = useState(null)
   const [openImagesModalId, setOpenImagesModalId] = useState(null)
   const [searchText, setSearchText] = useState("")
   const [searching, setSearching] = useState(false)
-
-  const alreadySearched = useRef(false)
-  useEffect(() => {
-    if (searchText.trim() === "" && !alreadySearched.current) {
-      alreadySearched.current = true
-      getInitialProducts()
-    }
-  }, [getInitialProducts, searchText])
 
   const normalizedText = (text) => {
     return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
@@ -39,8 +31,9 @@ function useStockList() {
     return null;
   };
 
+
   const handleSearch = async () => {
-    alreadySearched.current = false
+
     try {
       setSearching(true);
 
@@ -131,14 +124,19 @@ function useStockList() {
         )
       }
     }, {
-      title: "Precio y stock",
+      title: "Acerca de",
+      width: 200,
       render: (_, record) => {
         const stock = record.product_stock;
         const price = parseFloat(record.product_price).toLocaleString("es-AR", { style: 'currency', currency: "ARS" })
+        const category = categories && categories.length > 0 && categories.find(
+          cat => cat.category_id === record.product_category
+        ).category_name
         return (
           <div>
             <p><strong>Precio: </strong>{price} c/u</p>
             <p><strong>Stock: </strong>{stock}</p>
+            <p><strong>Categoría: </strong>{category}</p>
           </div>
         )
       }
