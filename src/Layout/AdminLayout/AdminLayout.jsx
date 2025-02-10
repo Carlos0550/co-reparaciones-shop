@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
-import Logo from "../../../assets/images/Logo.jpeg"
+//import Logo from "../../../assets/images/Logo.jpeg"
 import MenuIcon from "../../../assets/Icons/MenuIcon.svg"
 
 import "./AdminLayout.css"
 import { useAppContext } from '../../Context/AppContext'
+import { useNavigate } from 'react-router-dom'
 function AdminLayout({ renderContent }) {
     const { width } = useAppContext();
     const [openMobileMenu, setOpenMobileMenu] = useState(false)
@@ -15,18 +16,20 @@ function AdminLayout({ renderContent }) {
             setTimeout(() => {
                 setOpenMobileMenu(false);
                 setClosing(false);
-            }, 400); // Duración de la animación de cierre
+            }, 400); 
         } else {
             setOpenMobileMenu(true);
         }
     };
+
+    const navigate = useNavigate()
     return (
         <React.Fragment>
             <section className='admin-layout-container'>
                 <header className='admin-layout-header'>
                     <nav className='admin-layout-nav'>
                         <picture className='admin-layout-logo'>
-                            <img src={Logo} alt="" />
+                            <img src={"https://placehold.co/600x400"} alt="" />
                         </picture>
 
                         <ul className='admin-layout-menu'
@@ -34,8 +37,12 @@ function AdminLayout({ renderContent }) {
                                 display: width < 768 ? "none" : "flex"
                             }}
                         >
-                            <li>Dashboard</li>
-                            <li>Stock</li>
+                            <li
+                                onClick={()=> navigate("/")}
+                            >Dashboard</li>
+                            <li 
+                                onClick={()=> navigate("/products-management")}
+                            >Stock</li>
                             <li>Promociones</li>
                             <li>Banners</li>
                             <li>Ajustes</li>
