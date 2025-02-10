@@ -8,5 +8,6 @@ export const urls = {
 }
 
 export const apis = {
-    products: `${urls.development.baseUrl}/products`
+    products: `${urls.development.baseUrl}/products`,
+    categories: `${urls.development.baseUrl}/categories`
 }
