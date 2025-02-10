@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import "./App.css"
 import { Routes, Route } from "react-router-dom"
 import AdminLayout from './Layout/AdminLayout/AdminLayout'
-import StockManager from './StockManager/StockManager'
+import StockAndCategoriesManager from './StockAndCategoriesManager/StockAndCategoriesManager'
+import PromotionsManager from './PromotionsManager/PromotionsManager'
 function App() {
   return (
     <Routes>
-      <Route path='/' element={<AdminLayout renderContent={<StockManager/>}/>}/>
+      <Route path='/dashboard' element={<AdminLayout renderContent={<PromotionsManager/>}/>}/>
+      <Route path='/products-management' element={<AdminLayout renderContent={<StockAndCategoriesManager/>}/>}/>
     </Routes>
   )
 }
