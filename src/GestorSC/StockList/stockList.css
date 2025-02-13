@@ -1,0 +1,81 @@
+.update-stock-btn{
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #102341;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 5px;
+}
+
+.update-stock-btn:hover{
+    transform: translateY(-3px);
+}
+.minified-stock-list-images-container{
+    display: flex;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    justify-content: space-evenly;
+    flex: 1;
+    gap: 1rem;
+}
+.minified-stock-list-images{
+    max-width: 200px;
+    max-height: 200px;
+    overflow: hidden;
+    aspect-ratio: 1/1;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.minified-stock-list-images img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: calc();
+}
+
+.stock-list-search-label {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1rem;
+    margin-top: .5rem;
+  }
+  
+  .stock-list-search-input {
+    width: 100%;
+    padding: 8px 35px 8px 10px; 
+    border: none;
+    border-radius: 4px;
+    outline: 1px solid #a9a9a9;
+    transition: all 300ms ease-in-out;
+  }
+
+  .stock-list-search-input:focus{
+    border: none;
+    outline: 1px solid #102341;
+  }
+  
+  .cross-icon-stock-list {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #888;
+    font-size: 16px;
+  }
+  
+  .cross-icon-stock-list:hover {
+    color: #333;
+  }
+  
+
+@media(max-width:768px){
+    .stock-list-search-label{
+        max-width: 100%;
+    }
+}
