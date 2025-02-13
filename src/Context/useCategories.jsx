@@ -59,7 +59,8 @@ function useCategories() {
         } catch (error) {
             console.log(error)
             notification.error({
-                message: error.message,
+                message: "No fue posible eliminar esta categoría",
+                description: error.message,
                 showProgress: true,
                 pauseOnHover: false,
                 duration: 3
