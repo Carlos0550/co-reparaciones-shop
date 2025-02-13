@@ -1,7 +1,8 @@
 import React from 'react'
 import "./promotionsManager.css"
 import { Collapse } from 'antd'
-import UpsertPromotionForm from './components/Promotions/PromotionEditor/UpsertPromotionForm'
+
+import UpsertPromotionForm from './PromotionForm/UpsertPromotionForm'
 function PromotionsManager() {
     return (
         <React.Fragment>
