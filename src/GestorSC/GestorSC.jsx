@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import "./StockManager.css"
+import "./gestorSC.css"
 import { Collapse } from "antd"
 import AddStock from './AddStock/AddStock'
 import StockList from './StockList/StockList'
 import AddCategoryForm from './AddCategories/AddCategoryForm'
 import ListCategories from './ListCategories/ListCategories'
-function StockAndCategoriesManager() {
+function GestorSC() {
     const [activeKeys, setActiveKeys] = useState([]);
   return (
     <React.Fragment>
@@ -45,4 +45,4 @@ function StockAndCategoriesManager() {
   )
 }
 
-export default StockAndCategoriesManager
+export default GestorSC
