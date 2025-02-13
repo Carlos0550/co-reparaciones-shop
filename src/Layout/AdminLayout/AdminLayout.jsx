@@ -42,7 +42,7 @@ function AdminLayout({ renderContent }) {
                             >Dashboard</li>
                             <li 
                                 onClick={()=> navigate("/products-management")}
-                            >Stock</li>
+                            >Stock y categorías</li>
                             <li>Promociones</li>
                             <li>Banners</li>
                             <li>Ajustes</li>
