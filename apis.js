@@ -9,5 +9,6 @@ export const urls = {
 
 export const apis = {
     products: `${urls.development.baseUrl}/products`,
-    categories: `${urls.development.baseUrl}/categories`
+    categories: `${urls.development.baseUrl}/categories`,
+    promotions: `${urls.development.baseUrl}/promotions`
 }
