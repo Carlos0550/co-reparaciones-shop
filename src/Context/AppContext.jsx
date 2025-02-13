@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import useProducts from "./useProducts.tsx";
 import { useLocation, useNavigate } from "react-router-dom";
 import useCategories from "./useCategories";
+import usePromotions from "./usePromotions.jsx";
 
 const AppContext = createContext();
 
@@ -50,18 +51,21 @@ export const AppContextProvider = ({ children }) => {
 
     const productsHook = useProducts(isOnline)
     const categoriesHook = useCategories()
+    const promotionsHook = usePromotions()
     const contextValues = useMemo(() => ({
         width,
         ...productsHook,
         isOnline,
         editStockArguments, setEditStockArguments,
-        ...categoriesHook
+        ...categoriesHook,
+        ...promotionsHook
     }), [
         width,
         productsHook,
         isOnline,
         editStockArguments, setEditStockArguments,
-        categoriesHook
+        categoriesHook,
+        promotionsHook
     ])
 
     return (
