@@ -6,7 +6,7 @@ import "@toast-ui/editor/toastui-editor.css"
 import AddStockValidation from './utils/AddStockValidation'
 import { Switch } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import { useAppContext } from '../../Context/AppContext'
+import { useAppContext } from '../../Context/AppContext.tsx'
 function AddStock({ productToEdit }) {
     const editorRef = useRef(null)
     const { 

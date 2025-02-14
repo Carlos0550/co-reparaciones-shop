@@ -3,6 +3,7 @@ import "./promotionsManager.css"
 import { Collapse } from 'antd'
 
 import UpsertPromotionForm from './PromotionForm/UpsertPromotionForm'
+import PromotionList from './PromotionList/PromotionList'
 function PromotionsManager() {
     return (
         <React.Fragment>
@@ -15,7 +16,7 @@ function PromotionsManager() {
                         {
                             key: "1",
                             label: "Promociones",
-                            children: <div>hola</div>,
+                            children: <PromotionList/>,
                         },
                         {
                             key: "2",

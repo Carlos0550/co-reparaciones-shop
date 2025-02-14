@@ -3,7 +3,7 @@ import './upsertPromotionForm.css';
 import { Editor } from '@toast-ui/react-editor';
 import '@toast-ui/editor/toastui-editor.css';
 import usePromotionEditor from './utils/usePromotionEditor';
-import { useAppContext } from "../../Context/AppContext"
+import { useAppContext } from "../../Context/AppContext.tsx"
 function UpsertPromotionForm() {
     const {
         promotionEditorRef, editorRef, handleChange, formData,

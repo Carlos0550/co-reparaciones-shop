@@ -2,7 +2,7 @@ import { Button, Modal, notification, Popconfirm, Popover, Space } from 'antd'
 import React, { useState } from 'react'
 import { apis } from '../../../../apis'
 import { DeleteOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons'
-import { useAppContext } from '../../../Context/AppContext'
+import { useAppContext } from '../../../Context/AppContext.tsx'
 
 function useStockList() {
 

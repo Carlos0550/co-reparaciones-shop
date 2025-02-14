@@ -1,7 +1,7 @@
 import { Table } from 'antd'
 import React, { useEffect, useRef } from 'react'
 import "./stockList.css"
-import { useAppContext } from '../../Context/AppContext.jsx'
+import { useAppContext } from '../../Context/AppContext.tsx'
 import useStockList from './utils/useStockList.jsx'
 import { SearchOutlined } from '@ant-design/icons'
 

@@ -1,23 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { apis } from '../../apis'
 import { message, notification } from 'antd'
+import { Product } from './Typescript/PromotionTypes'
 
 function useProducts(isOnline) {
-    
-    interface Product {
-        product_id: string,
-        product_name: string,
-        product_price: number,
-        product_stock: number,
-        product_description: string,
-        product_options: string,
-        product_category: string,
-        images: string[]
-    }
 
     interface ApiResponse {
         products: Product[]
     }
+    
     const [products, setProducts] = useState<Product[]>([])
     
     const getInitialProducts = useCallback(async () => {

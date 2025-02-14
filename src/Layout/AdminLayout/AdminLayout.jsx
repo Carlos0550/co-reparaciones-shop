@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import MenuIcon from "../../../assets/Icons/MenuIcon.svg"
 
 import "./AdminLayout.css"
-import { useAppContext } from '../../Context/AppContext'
+import { useAppContext } from '../../Context/AppContext.tsx'
 import { useNavigate } from 'react-router-dom'
 function AdminLayout({ renderContent }) {
     const { width } = useAppContext();

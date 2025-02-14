@@ -10,8 +10,8 @@ function usePromotions() {
     try {
       const response = await fetch(baseUrl)
       const responseData = await response.json()
-      console.log(responseData)
 
+      if(response.status === 404) return;
       if (!response.ok) throw new Error(responseData.msg || "Error desconocido");
       setPromotions(responseData.promotions)
       return true
@@ -54,6 +54,32 @@ function usePromotions() {
     }
   }, [getAllPromotions])
 
+  const updatePromotion = useCallback(async (promotionValues) => {
+    const baseUrl = new URL(apis.promotions + "/update-promotion")
+    try {
+      const response = await fetch(baseUrl, {
+        method: "POST",
+        body: promotionValues
+      })
+
+      const responseData = await response.json()
+      if (!response.ok) throw new Error(responseData.msg || "Error desconocido.")
+      message.success("Promoción actualizada con éxito")
+      await getAllPromotions()
+      return true
+    } catch (error) {
+      console.log(error)
+      notification.error({
+        message: "No fué posible actualizar la promoción.",
+        description: error.message,
+        duration: 4,
+        showProgress: true
+      })
+
+      return false
+    }
+  }, [getAllPromotions])
+
 
   const alreadyFetched = useRef(false)
   useEffect(()=>{
@@ -65,10 +91,12 @@ function usePromotions() {
 
   return useMemo(() => ({
     createPromotion,
-    promotions, getAllPromotions
+    promotions, getAllPromotions,
+    updatePromotion
   }), [
     createPromotion,
-    promotions, getAllPromotions
+    promotions, getAllPromotions,
+    updatePromotion
   ])
 }
 

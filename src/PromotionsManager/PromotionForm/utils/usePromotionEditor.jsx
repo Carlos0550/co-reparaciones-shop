@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { notification } from "antd"
-import { useAppContext } from "../../../Context/AppContext"
+import { useAppContext } from "../../../Context/AppContext.tsx"
 function usePromotionEditor() {
     const promotionEditorRef = useRef(null);
     const editorRef = useRef(null);

@@ -1,6 +1,6 @@
 import { DeleteOutlined, EditOutlined, SettingOutlined } from "@ant-design/icons"
 import { Button, Popconfirm, Popover, Space } from "antd"
-import { useAppContext } from "../../../Context/AppContext"
+import { useAppContext } from "../../../Context/AppContext.tsx"
 
 function useListCategories() {
     const { 

@@ -2,7 +2,7 @@ import { message } from "antd"
 import { useEffect, useRef, useState } from "react"
 import { v4 } from "uuid"
 
-import { useAppContext } from "../../../Context/AppContext"
+import { useAppContext } from "../../../Context/AppContext.tsx"
 import { apis, urls } from "../../../../apis"
 import handleUpload from "./ImageUploader"
 import { handleVerifyFields, handleVerifyValues } from "./VerifyStockFields"

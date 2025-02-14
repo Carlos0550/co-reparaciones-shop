@@ -1,11 +1,12 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext,useContext, useEffect, useMemo, useState } from "react";
 import useProducts from "./useProducts.tsx";
 import { useLocation, useNavigate } from "react-router-dom";
-import useCategories from "./useCategories";
+import useCategories from "./useCategories.jsx";
 import usePromotions from "./usePromotions.jsx";
 
 const AppContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAppContext = () => {
     const context = useContext(AppContext);
     if (!context) {
@@ -14,6 +15,7 @@ export const useAppContext = () => {
     return context;
 }
 
+// eslint-disable-next-line react/prop-types
 export const AppContextProvider = ({ children }) => {
     const [width, setWidth] = useState(window.innerWidth)
     const navigate = useNavigate()
@@ -49,6 +51,14 @@ export const AppContextProvider = ({ children }) => {
         productID: null
     })
 
+    const [editPromotionArguments, setEditPromotionArguments] = useState<{
+        editing: boolean,
+        promotionID: string
+    }>({
+        editing: false,
+        promotionID: ""
+    })
+
     const productsHook = useProducts(isOnline)
     const categoriesHook = useCategories()
     const promotionsHook = usePromotions()
@@ -58,14 +68,16 @@ export const AppContextProvider = ({ children }) => {
         isOnline,
         editStockArguments, setEditStockArguments,
         ...categoriesHook,
-        ...promotionsHook
+        ...promotionsHook,
+        editPromotionArguments, setEditPromotionArguments
     }), [
         width,
         productsHook,
         isOnline,
         editStockArguments, setEditStockArguments,
         categoriesHook,
-        promotionsHook
+        promotionsHook,
+        editPromotionArguments, setEditPromotionArguments
     ])
 
     return (

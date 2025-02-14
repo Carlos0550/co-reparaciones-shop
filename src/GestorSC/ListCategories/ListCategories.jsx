@@ -2,7 +2,7 @@ import { Table } from 'antd'
 import React from 'react'
 import useListCategories from './utils/useListCategories'
 
-import { useAppContext } from '../../Context/AppContext'
+import { useAppContext } from '../../Context/AppContext.tsx'
 function ListCategories() {
     const { 
         categoryColumns

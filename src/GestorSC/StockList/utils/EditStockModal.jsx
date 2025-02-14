@@ -1,7 +1,7 @@
 import { CloseOutlined } from '@ant-design/icons'
 import { Button, Modal } from 'antd'
 import React, { useEffect, useState } from 'react'
-import { useAppContext } from '../../../Context/AppContext'
+import { useAppContext } from '../../../Context/AppContext.tsx'
 import EditStock from "../../AddStock/AddStock"
 
 function StockListModal() {
